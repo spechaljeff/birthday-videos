@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Birthday!">
+<title>Happy Birthday Videos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/*
+  EDIT YOUR VIDEO LIST in the VIDEOS array near the bottom of this file
+  (look for "★ VIDEO LIST ★"). Videos added from the grown-up panel
+  are saved on that one iPad only.
+*/
+:root{
+  --sky1:#5fd3ff; --sky2:#b98cff; --pink:#ff4fa3; --yellow:#ffd23f;
+  --green:#3ddc84; --orange:#ff8a3d; --ink:#2b1a4a; --paper:#fffdf6;
+}
+*{box-sizing:border-box;min-width:0;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{
+  font-family:"Fredoka",ui-rounded,"Arial Rounded MT Bold",system-ui,sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at 20% 15%,rgba(255,255,255,.35) 0 8%,transparent 9%),
+    radial-gradient(circle at 85% 30%,rgba(255,255,255,.25) 0 6%,transparent 7%),
+    linear-gradient(160deg,var(--sky1),var(--sky2) 70%,#ff9fd0);
+  background-attachment:fixed;
+  overflow-x:hidden;
+  user-select:none;-webkit-user-select:none;
+  touch-action:manipulation;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+/* confetti sprinkles on the background */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.55;
+  background-image:
+    radial-gradient(circle,var(--yellow) 0 4px,transparent 5px),
+    radial-gradient(circle,var(--pink) 0 3px,transparent 4px),
+    radial-gradient(circle,#fff 0 3px,transparent 4px),
+    radial-gradient(circle,var(--green) 0 3px,transparent 4px);
+  background-size:140px 140px,190px 190px,110px 110px,230px 230px;
+  background-position:10px 20px,70px 90px,40px 60px,120px 10px;
+}
+
+/* bunting */
+.bunting{position:relative;z-index:2;height:70px;display:flex;justify-content:center;overflow:hidden}
+.bunting svg{width:100%;height:70px}
+
+header{position:relative;z-index:2;text-align:center;padding:0 16px 8px}
+h1{
+  margin:0;font-weight:700;line-height:1.05;
+  font-size:clamp(44px,8vw,92px);letter-spacing:1px;
+  text-shadow:0 4px 0 rgba(43,26,74,.25);
+}
+h1 span{display:inline-block;animation:hop 1.6s ease-in-out infinite;color:#fff;-webkit-text-stroke:3px var(--ink);paint-order:stroke fill}
+@keyframes hop{0%,100%{transform:translateY(0) rotate(var(--r,0deg))}50%{transform:translateY(-10px) rotate(calc(var(--r,0deg) * -1))}}
+.sub{margin:6px 0 0;font-size:clamp(20px,2.6vw,28px);font-weight:500;color:#fff;text-shadow:0 2px 0 rgba(43,26,74,.3)}
+
+/* scattered cards */
+main{position:relative;z-index:2;max-width:1240px;margin:0 auto;padding:24px clamp(16px,4vw,48px) 120px}
+.wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:clamp(28px,4vw,52px) clamp(20px,3vw,40px)}
+.card{
+  appearance:none;border:0;cursor:pointer;font:inherit;color:inherit;text-align:center;
+  background:var(--paper);padding:12px 12px 14px;border-radius:14px;
+  box-shadow:0 10px 0 rgba(43,26,74,.18),0 18px 30px rgba(43,26,74,.25);
+  transform:translate(var(--dx),var(--dy)) rotate(var(--rot));
+  transition:transform .25s cubic-bezier(.3,1.6,.5,1);
+  position:relative;
+}
+.card:active,.card.tapped{transform:translate(var(--dx),var(--dy)) rotate(0deg) scale(1.08)}
+.card:focus-visible{outline:5px solid var(--yellow);outline-offset:6px}
+.card::before{ /* tape */
+  content:"";position:absolute;top:-14px;left:50%;width:90px;height:28px;
+  transform:translateX(-50%) rotate(calc(var(--rot) * -1.5));
+  background:var(--tape);opacity:.85;border-radius:4px;
+  box-shadow:0 2px 4px rgba(0,0,0,.12);
+}
+.thumb{position:relative;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:var(--tape)}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.play{
+  position:absolute;inset:0;margin:auto;width:72px;height:72px;border-radius:50%;
+  background:var(--pink);border:5px solid #fff;display:grid;place-items:center;
+  box-shadow:0 4px 10px rgba(0,0,0,.3);
+}
+.play::after{content:"";margin-left:6px;border-left:24px solid #fff;border-top:15px solid transparent;border-bottom:15px solid transparent}
+.label{margin-top:10px;font-size:20px;font-weight:700;line-height:1.2;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.empty{grid-column:1/-1;text-align:center;color:#fff;font-size:24px;padding:40px}
+
+/* balloons */
+#sky{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+.balloon{position:absolute;bottom:-160px;width:70px;pointer-events:auto;cursor:pointer;
+  animation:rise linear forwards}
+.balloon .sway{animation:sway 3s ease-in-out infinite alternate;transform-origin:50% 100%}
+.balloon svg{width:100%;height:auto;display:block;filter:drop-shadow(0 6px 6px rgba(43,26,74,.2))}
+@keyframes rise{to{transform:translateY(calc(-100vh - 260px))}}
+@keyframes sway{from{transform:rotate(-8deg) translateX(-12px)}to{transform:rotate(8deg) translateX(12px)}}
+.pop{position:fixed;z-index:60;pointer-events:none;width:10px;height:10px;border-radius:2px;animation:burst .9s ease-out forwards}
+@keyframes burst{to{transform:translate(var(--tx),var(--ty)) rotate(540deg);opacity:0}}
+
+/* player */
+#player{position:fixed;inset:0;z-index:50;display:none;flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(43,26,74,.88);padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom))}
+#player.open{display:flex;animation:fadein .25s}
+@keyframes fadein{from{opacity:0}}
+.screen{width:min(100%,calc((100vh - 170px) * 16 / 9));aspect-ratio:16/9;background:#000;border-radius:20px;overflow:hidden;
+  border:8px solid #fff;box-shadow:0 0 0 8px var(--pink),0 20px 50px rgba(0,0,0,.5)}
+.screen iframe,.screen>div{width:100%;height:100%;border:0;display:block}
+.controls{display:flex;gap:18px;margin-top:22px;flex-wrap:wrap;justify-content:center}
+.big{appearance:none;border:0;font:inherit;font-weight:700;font-size:26px;color:#fff;cursor:pointer;
+  min-width:150px;min-height:76px;padding:0 26px;border-radius:40px;
+  box-shadow:0 6px 0 rgba(0,0,0,.25);transition:transform .1s}
+.big:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.25)}
+.big:focus-visible{outline:5px solid var(--yellow);outline-offset:4px}
+.b-back{background:var(--orange)} .b-again{background:var(--green)} .b-next{background:var(--pink)}
+.ended .b-again,.ended .b-next{animation:wiggle .6s ease-in-out infinite}
+@keyframes wiggle{0%,100%{transform:rotate(-4deg) scale(1.05)}50%{transform:rotate(4deg) scale(1.1)}}
+
+/* grown-up panel */
+#gear{position:fixed;right:max(14px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom));z-index:40;
+  width:52px;height:52px;border-radius:50%;border:0;background:rgba(255,255,255,.35);color:var(--ink);
+  font-size:13px;font-weight:700;cursor:pointer;display:grid;place-items:center}
+#gear svg{width:26px;height:26px}
+#gear .ring{position:absolute;inset:-4px;border-radius:50%;border:4px solid transparent}
+#gear.holding .ring{border-color:var(--yellow);transition:border-color 1.5s}
+#hint{position:fixed;right:76px;bottom:max(26px,calc(env(safe-area-inset-bottom) + 12px));z-index:40;background:#fff;
+  padding:6px 12px;border-radius:12px;font-size:15px;opacity:0;transition:opacity .3s;pointer-events:none}
+#hint.show{opacity:1}
+#panel{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;background:rgba(43,26,74,.6);padding:16px}
+#panel.open{display:flex}
+.sheet{background:#fff;border-radius:22px;width:min(560px,100%);max-height:90vh;overflow:auto;padding:24px;user-select:text;-webkit-user-select:text}
+.sheet h2{margin:0 0 4px;font-size:28px}
+.sheet p{margin:0 0 16px;font-size:16px;color:#5a4a78}
+.sheet label{display:block;font-size:15px;font-weight:700;margin:12px 0 6px}
+.sheet input{width:100%;font:inherit;font-size:17px;padding:12px 14px;border:3px solid #e2d8f5;border-radius:12px}
+.sheet input:focus{outline:none;border-color:var(--sky2)}
+.row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.btn{appearance:none;border:0;font:inherit;font-weight:700;font-size:17px;min-height:48px;padding:0 20px;border-radius:24px;cursor:pointer;background:#efe8fb;color:var(--ink)}
+.btn.primary{background:var(--pink);color:#fff}
+.err{color:#c2185b;font-size:15px;min-height:20px;margin-top:6px}
+.list{list-style:none;margin:20px 0 0;padding:0;border-top:2px solid #f0eafa}
+.list li{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:2px solid #f0eafa}
+.list img{width:80px;aspect-ratio:16/9;object-fit:cover;border-radius:6px;flex:none}
+.list span{flex:1;font-size:16px}
+.list button{flex:none;min-height:44px;min-width:44px}
+
+@media (prefers-reduced-motion:reduce){
+  h1 span,.ended .b-again,.ended .b-next{animation:none}
+  #sky{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="bunting" aria-hidden="true"><svg id="bunting" preserveAspectRatio="none" viewBox="0 0 1200 70"></svg></div>
+<header>
+  <h1 id="title" aria-label="Happy Birthday!"></h1>
+  <p class="sub">Tap a video to sing along!</p>
+</header>
+
+<main><div class="wall" id="wall"></div></main>
+<div id="sky" aria-hidden="true"></div>
+
+<div id="player" role="dialog" aria-modal="true" aria-label="Video player">
+  <div class="screen"><div id="yt"></div></div>
+  <div class="controls" id="controls">
+    <button class="big b-back" id="back">◀ Back</button>
+    <button class="big b-again" id="again">↻ Again!</button>
+    <button class="big b-next" id="next">Next ▶</button>
+  </div>
+</div>
+
+<button id="gear" aria-label="Grown-ups: press and hold to edit videos">
+  <span class="ring"></span>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg>
+</button>
+<div id="hint">Grown-ups: hold for 2 seconds</div>
+
+<div id="panel" role="dialog" aria-modal="true" aria-labelledby="ptitle">
+  <div class="sheet">
+    <h2 id="ptitle">Grown-up corner</h2>
+    <p>Paste a YouTube link to add a video. Changes made here stay on this iPad.</p>
+    <form id="addForm">
+      <label for="url">YouTube link</label>
+      <input id="url" inputmode="url" autocomplete="off" placeholder="https://www.youtube.com/watch?v=…">
+      <label for="name">Name on the card (optional)</label>
+      <input id="name" autocomplete="off" placeholder="Grandma sings!">
+      <div class="err" id="err"></div>
+      <div class="row">
+        <button class="btn primary" type="submit">Add video</button>
+        <button class="btn" type="button" id="reset">Reset to starter list</button>
+        <button class="btn" type="button" id="close">Done</button>
+      </div>
+    </form>
+    <ul class="list" id="list"></ul>
+  </div>
+</div>
+
+<script>
+{
+/* ★ VIDEO LIST ★  Add your own: { id: "the 11 characters after v=", name: "Card label" } */
+const VIDEOS = [
+  { id: "RUWshqxMa2Y", name: "Emma & Jannie sing!" },
+  { id: "2N7kP41jU2s", name: "I Want to Say Happy Birthday" },
+  { id: "biMn4YC5qCI", name: "BabyBus Happy Birthday" }
+];
+
+const KEY = "bday-videos-v1";
+const COLORS = ["#ff4fa3","#ffd23f","#3ddc84","#5fd3ff","#ff8a3d","#b98cff"];
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const thumb = id => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+
+let videos = load();
+function load(){
+  try { const v = JSON.parse(localStorage.getItem(KEY)); if (Array.isArray(v)) return v; } catch(e){}
+  return VIDEOS.slice();
+}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(videos)); } catch(e){} }
+
+/* seeded wobble so each card keeps the same tilt */
+function rand(seed){ let h = 0; for (const c of seed) h = (h * 31 + c.charCodeAt(0)) | 0; return () => { h = (h * 1103515245 + 12345) | 0; return ((h >>> 0) % 1000) / 1000; }; }
+
+/* title letters */
+$("#title").innerHTML = "Happy Birthday!".split("").map((ch, i) =>
+  ch === " " ? "&nbsp;" : `<span style="--r:${(i % 2 ? 4 : -4)}deg;animation-delay:${i * .08}s;-webkit-text-stroke-color:${COLORS[i % 6]}" aria-hidden="true">${ch}</span>`
+).join("");
+
+/* bunting flags */
+{
+  let s = `<path d="M0 8 Q600 40 1200 8" stroke="#fff" stroke-width="3" fill="none"/>`;
+  for (let i = 0; i < 24; i++) {
+    const x = i * 50 + 5, y = 8 + 32 * Math.sin(Math.PI * (x + 20) / 1200) * 0.9;
+    s += `<path d="M${x} ${y} L${x + 40} ${y} L${x + 20} ${y + 34} Z" fill="${COLORS[i % 6]}" stroke="#fff" stroke-width="2"/>`;
+  }
+  $("#bunting").innerHTML = s;
+}
+
+function render(){
+  const wall = $("#wall");
+  if (!videos.length) { wall.innerHTML = `<div class="empty">No videos yet! A grown-up can add some with the button in the corner.</div>`; return; }
+  wall.innerHTML = videos.map((v, i) => {
+    const r = rand(v.id + i);
+    const rot = (r() * 16 - 8).toFixed(1), dx = (r() * 24 - 12).toFixed(0), dy = (r() * 30 - 10).toFixed(0);
+    return `<button class="card" data-i="${i}" style="--rot:${rot}deg;--dx:${dx}px;--dy:${dy}px;--tape:${COLORS[i % 6]}">
+      <div class="thumb"><img src="${thumb(esc(v.id))}" alt="" loading="lazy"><span class="play"></span></div>
+      <div class="label">${esc(v.name || "Happy Birthday!")}</div>
+    </button>`;
+  }).join("");
+}
+
+/* sounds: tiny synth, no files needed */
+let ac;
+function tone(freqs, dur = .12){
+  try {
+    ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+    freqs.forEach((f, k) => {
+      const o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime + k * dur;
+      o.type = "triangle"; o.frequency.value = f;
+      g.gain.setValueAtTime(.18, t); g.gain.exponentialRampToValueAtTime(.001, t + dur * 1.6);
+      o.connect(g).connect(ac.destination); o.start(t); o.stop(t + dur * 1.7);
+    });
+  } catch(e){}
+}
+
+function confetti(x, y, n = 18){
+  for (let i = 0; i < n; i++) {
+    const p = document.createElement("div"), a = Math.random() * Math.PI * 2, d = 60 + Math.random() * 110;
+    p.className = "pop";
+    p.style.cssText = `left:${x}px;top:${y}px;background:${COLORS[i % 6]};--tx:${Math.cos(a) * d}px;--ty:${Math.sin(a) * d}px`;
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 950);
+  }
+}
+
+/* balloons */
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+function balloon(){
+  if (document.hidden || $("#sky").children.length > 9) return;
+  const c = COLORS[Math.floor(Math.random() * 6)], b = document.createElement("div"), w = 55 + Math.random() * 40;
+  b.className = "balloon";
+  b.style.cssText = `left:${Math.random() * 92}vw;width:${w}px;animation-duration:${11 + Math.random() * 8}s`;
+  b.innerHTML = `<div class="sway" style="animation-duration:${2.4 + Math.random() * 1.6}s"><svg viewBox="0 0 60 120">
+    <path d="M30 4C14 4 4 18 4 34c0 20 16 36 26 38 10-2 26-18 26-38C56 18 46 4 30 4Z" fill="${c}"/>
+    <ellipse cx="20" cy="24" rx="6" ry="10" fill="#fff" opacity=".45" transform="rotate(-20 20 24)"/>
+    <path d="M26 72h8l-4 6Z" fill="${c}"/>
+    <path d="M30 78c-6 10 6 18 0 28s4 12 0 14" stroke="#fff" stroke-width="1.5" fill="none" opacity=".9"/></svg></div>`;
+  b.addEventListener("pointerdown", e => {
+    e.stopPropagation(); confetti(e.clientX, e.clientY, 14); tone([880, 1320], .06); b.remove();
+  });
+  b.addEventListener("animationend", ev => { if (ev.target === b) b.remove(); });
+  $("#sky").appendChild(b);
+}
+if (!reduce) { for (let i = 0; i < 3; i++) setTimeout(balloon, i * 900); setInterval(balloon, 2600); }
+
+/* YouTube player */
+let yt = null, ytReady = false, current = -1, pending = null;
+window.onYouTubeIframeAPIReady = () => { ytReady = true; if (pending !== null) { const p = pending; pending = null; play(p); } };
+const tag = document.createElement("script"); tag.src = "https://www.youtube.com/iframe_api"; document.head.appendChild(tag);
+
+function play(i){
+  current = (i + videos.length) % videos.length;
+  $("#player").classList.add("open"); $("#controls").classList.remove("ended");
+  const id = videos[current].id;
+  if (!ytReady) { pending = current; return; }
+  if (yt) { yt.loadVideoById(id); return; }
+  yt = new YT.Player("yt", {
+    videoId: id, host: "https://www.youtube-nocookie.com",
+    playerVars: { autoplay: 1, playsinline: 1, rel: 0, modestbranding: 1, fs: 0, iv_load_policy: 3 },
+    events: {
+      onReady: e => e.target.playVideo(),
+      onStateChange: e => { if (e.data === 0) { $("#controls").classList.add("ended"); tone([523, 659, 784, 1046]); } },
+      onError: () => { $("#controls").classList.add("ended"); }
+    }
+  });
+}
+function closePlayer(){
+  $("#player").classList.remove("open"); pending = null;
+  try { yt && yt.stopVideo(); } catch(e){}
+}
+
+$("#wall").addEventListener("click", e => {
+  const c = e.target.closest(".card"); if (!c) return;
+  const r = c.getBoundingClientRect();
+  c.classList.add("tapped"); confetti(r.left + r.width / 2, r.top + r.height / 2, 24); tone([523, 659, 784]);
+  setTimeout(() => { c.classList.remove("tapped"); play(+c.dataset.i); }, 380);
+});
+$("#back").onclick = closePlayer;
+$("#again").onclick = () => { $("#controls").classList.remove("ended"); try { yt.seekTo(0); yt.playVideo(); } catch(e){ play(current); } };
+$("#next").onclick = () => play(current + 1);
+
+/* grown-up corner: press and hold so little fingers don't open it */
+let holdTimer;
+const gear = $("#gear");
+gear.addEventListener("pointerdown", () => { gear.classList.add("holding"); holdTimer = setTimeout(openPanel, 2000); });
+["pointerup","pointerleave","pointercancel"].forEach(ev => gear.addEventListener(ev, () => { gear.classList.remove("holding"); clearTimeout(holdTimer); }));
+gear.addEventListener("click", () => { $("#hint").classList.add("show"); setTimeout(() => $("#hint").classList.remove("show"), 1800); });
+gear.addEventListener("contextmenu", e => e.preventDefault());
+
+function openPanel(){ gear.classList.remove("holding"); drawList(); $("#panel").classList.add("open"); }
+function drawList(){
+  $("#list").innerHTML = videos.map((v, i) => `<li><img src="${thumb(esc(v.id))}" alt=""><span>${esc(v.name || v.id)}</span>
+    <button class="btn" data-up="${i}" aria-label="Move up">▲</button><button class="btn" data-del="${i}">Remove</button></li>`).join("");
+}
+function parseId(s){
+  s = s.trim();
+  if (/^[\w-]{11}$/.test(s)) return s;
+  const m = s.match(/(?:v=|youtu\.be\/|shorts\/|embed\/|live\/)([\w-]{11})/);
+  return m ? m[1] : null;
+}
+$("#addForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const id = parseId($("#url").value);
+  if (!id) { $("#err").textContent = "That doesn't look like a YouTube link. Try copying it from the Share button."; return; }
+  if (videos.some(v => v.id === id)) { $("#err").textContent = "That video is already on the wall."; return; }
+  videos.push({ id, name: $("#name").value.trim() || "Happy Birthday!" });
+  save(); render(); drawList();
+  $("#url").value = ""; $("#name").value = ""; $("#err").textContent = "";
+});
+$("#list").addEventListener("click", e => {
+  const d = e.target.dataset;
+  if (d.del !== undefined) videos.splice(+d.del, 1);
+  else if (d.up !== undefined && +d.up > 0) { const i = +d.up; [videos[i - 1], videos[i]] = [videos[i], videos[i - 1]]; }
+  else return;
+  save(); render(); drawList();
+});
+$("#reset").onclick = () => { videos = VIDEOS.slice(); save(); render(); drawList(); };
+$("#close").onclick = () => $("#panel").classList.remove("open");
+
+render();
+}
+</script>
+</body>
+</html>
