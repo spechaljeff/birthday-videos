@@ -6,8 +6,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Birthday!">
-<title>Happy Birthday Videos</title>
+<meta name="apple-mobile-web-app-title" content="Parker's Videos">
+<title>Parker's Birthday Page</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
@@ -58,7 +58,10 @@ h1{
   font-size:clamp(44px,8vw,92px);letter-spacing:1px;
   text-shadow:0 4px 0 rgba(43,26,74,.25);
 }
-h1 span{display:inline-block;animation:hop 1.6s ease-in-out infinite;color:#fff;-webkit-text-stroke:3px var(--ink);paint-order:stroke fill}
+h1 .word{display:inline-block;white-space:nowrap;animation:none;-webkit-text-stroke:0}
+h1 .name{display:block;font-size:1.35em;animation:none;-webkit-text-stroke:0}
+h1 .name .word span{color:var(--yellow)}
+h1 .word span{display:inline-block;animation:hop 1.6s ease-in-out infinite;color:#fff;-webkit-text-stroke:3px var(--ink);paint-order:stroke fill}
 @keyframes hop{0%,100%{transform:translateY(0) rotate(var(--r,0deg))}50%{transform:translateY(-10px) rotate(calc(var(--r,0deg) * -1))}}
 .sub{margin:6px 0 0;font-size:clamp(20px,2.6vw,28px);font-weight:500;color:#fff;text-shadow:0 2px 0 rgba(43,26,74,.3)}
 
@@ -160,7 +163,7 @@ main{position:relative;z-index:2;max-width:1240px;margin:0 auto;padding:24px cla
 
 <div class="bunting" aria-hidden="true"><svg id="bunting" preserveAspectRatio="none" viewBox="0 0 1200 70"></svg></div>
 <header>
-  <h1 id="title" aria-label="Happy Birthday!"></h1>
+  <h1 id="title" aria-label="Parker's Happy Birthday Page!"></h1>
   <p class="sub">Tap a video to sing along!</p>
 </header>
 
@@ -208,7 +211,13 @@ main{position:relative;z-index:2;max-width:1240px;margin:0 auto;padding:24px cla
 const VIDEOS = [
   { id: "RUWshqxMa2Y", name: "Emma & Jannie sing!" },
   { id: "2N7kP41jU2s", name: "I Want to Say Happy Birthday" },
-  { id: "biMn4YC5qCI", name: "BabyBus Happy Birthday" }
+  { id: "biMn4YC5qCI", name: "BabyBus Happy Birthday" },
+  { id: "c-v-7JRisLA", name: "Super Simple Songs" },
+  { id: "90w2RegGf9w", name: "The Kiboomers Party!" },
+  { id: "II3bhXfarqo", name: "The Singing Walrus" },
+  { id: "TIQMqv0Iksc", name: "Chapel Choir sings!" },
+  { id: "EmH9f0c9olc", name: "Viking Singers" },
+  { id: "fizcMLeYqnE", name: "Big Choir Happy Birthday" }
 ];
 
 const KEY = "bday-videos-v1";
@@ -228,9 +237,14 @@ function save(){ try { localStorage.setItem(KEY, JSON.stringify(videos)); } catc
 function rand(seed){ let h = 0; for (const c of seed) h = (h * 31 + c.charCodeAt(0)) | 0; return () => { h = (h * 1103515245 + 12345) | 0; return ((h >>> 0) % 1000) / 1000; }; }
 
 /* title letters */
-$("#title").innerHTML = "Happy Birthday!".split("").map((ch, i) =>
-  ch === " " ? "&nbsp;" : `<span style="--r:${(i % 2 ? 4 : -4)}deg;animation-delay:${i * .08}s;-webkit-text-stroke-color:${COLORS[i % 6]}" aria-hidden="true">${ch}</span>`
-).join("");
+{
+  let n = 0;
+  const letters = w => `<span class="word">` + [...w].map(ch =>
+    `<span style="--r:${(n % 2 ? 4 : -4)}deg;animation-delay:${n * .07}s;-webkit-text-stroke-color:${COLORS[n++ % 6]}" aria-hidden="true">${ch}</span>`
+  ).join("") + `</span>`;
+  $("#title").innerHTML = `<span class="name">${letters("Parker's")}</span>` +
+    "Happy Birthday Page!".split(" ").map(letters).join(" ");
+}
 
 /* bunting flags */
 {
