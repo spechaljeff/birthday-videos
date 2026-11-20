@@ -286,20 +286,22 @@ function rand(seed){ let h = 0; for (const c of seed) h = (h * 31 + c.charCodeAt
 function render(){
   const wall = $("#wall");
   if (!videos.length) { wall.innerHTML = `<div class="empty">No videos yet! A grown-up can add some with the button in the corner.</div>`; return; }
+  /* photos land before these video positions, so they scatter across columns */
+  const SPOTS = [1, 5, 9, 11];
+  const photoHTML = k => { const p = PHOTOS[k], rr = rand(p.src);
+    return `<button class="photo" data-p="${k}" style="--rot:${(k % 2 ? 7 : -7) + (rr() * 4 - 2)}deg;--dx:${(rr() * 20 - 10).toFixed(0)}px;--dy:${(rr() * 20).toFixed(0)}px;--star:${COLORS[(k + 3) % 6]}">
+      <img src="${p.src}" alt="${esc(p.alt)}" loading="lazy"><span class="cap">${esc(p.cap)}</span></button>`; };
+  const tail = SPOTS.map((s, k) => s >= videos.length ? photoHTML(k) : "").join("");
   wall.innerHTML = videos.map((v, i) => {
     const r = rand(v.id + i);
     const rot = (r() * 16 - 8).toFixed(1), dx = (r() * 24 - 12).toFixed(0), dy = (r() * 30 - 10).toFixed(0);
-    let photo = "";
-    if (i % 3 === 1) {
-      const k = Math.floor(i / 3) % PHOTOS.length, p = PHOTOS[k];
-      photo = `<button class="photo" data-p="${k}" style="--rot:${(i % 2 ? 7 : -7) + (r() * 4 - 2)}deg;--dx:${(r() * 20 - 10).toFixed(0)}px;--dy:${(r() * 20).toFixed(0)}px;--star:${COLORS[(i + 3) % 6]}">
-        <img src="${p.src}" alt="${esc(p.alt)}" loading="lazy"><span class="cap">${esc(p.cap)}</span></button>`;
-    }
+    const k = SPOTS.indexOf(i);
+    const photo = k >= 0 ? photoHTML(k) : "";
     return photo + `<button class="card" data-i="${i}" style="--rot:${rot}deg;--dx:${dx}px;--dy:${dy}px;--tape:${COLORS[i % 6]}">
       <div class="thumb"><img src="${thumb(esc(v.id))}" alt="" loading="lazy"><span class="play"></span></div>
       <div class="label">${esc(v.name || "Happy Birthday!")}</div>
     </button>`;
-  }).join("");
+  }).join("") + tail;
 }
 
 /* sounds: tiny synth, no files needed */
