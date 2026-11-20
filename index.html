@@ -94,6 +94,21 @@ main{position:relative;z-index:2;max-width:1240px;margin:0 auto;padding:24px cla
 .play::after{content:"";margin-left:6px;border-left:24px solid #fff;border-top:15px solid transparent;border-bottom:15px solid transparent}
 .label{margin-top:10px;font-size:20px;font-weight:700;line-height:1.2;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+/* Parker photos */
+.wall{align-items:start}
+.photo{appearance:none;border:0;font:inherit;cursor:pointer;background:#fff;padding:10px 10px 12px;border-radius:6px;
+  box-shadow:0 10px 0 rgba(43,26,74,.15),0 18px 30px rgba(43,26,74,.25);
+  transform:translate(var(--dx),var(--dy)) rotate(var(--rot));transition:transform .25s cubic-bezier(.3,1.6,.5,1);
+  justify-self:center;width:min(100%,230px);position:relative}
+.photo:active,.photo.tapped{transform:translate(var(--dx),var(--dy)) rotate(0deg) scale(1.1)}
+.photo img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:3px}
+.photo .cap{display:block;margin-top:8px;font-size:21px;font-weight:700;color:var(--ink)}
+.photo::after{content:"★";position:absolute;top:-16px;right:-12px;font-size:34px;color:var(--star);
+  text-shadow:0 2px 0 rgba(43,26,74,.2);transform:rotate(15deg)}
+.side{position:absolute;top:6px;width:clamp(130px,13vw,190px);z-index:3}
+.side.l{left:max(2vw,12px)} .side.r{right:max(2vw,12px)}
+@media (min-width:1001px){header{min-height:calc(clamp(130px,13vw,190px) * 1.25 + 50px)}}
+@media (max-width:1000px){.side{display:none}}
 .empty{grid-column:1/-1;text-align:center;color:#fff;font-size:24px;padding:40px}
 
 /* balloons */
@@ -163,6 +178,8 @@ main{position:relative;z-index:2;max-width:1240px;margin:0 auto;padding:24px cla
 
 <div class="bunting" aria-hidden="true"><svg id="bunting" preserveAspectRatio="none" viewBox="0 0 1200 70"></svg></div>
 <header>
+  <button class="photo side l" data-p="0" style="--rot:-9deg;--dx:0px;--dy:0px;--star:#ffd23f"><img src="parker-1.jpg" alt="Parker with his birthday cake"><span class="cap">Birthday boy!</span></button>
+  <button class="photo side r" data-p="2" style="--rot:8deg;--dx:0px;--dy:0px;--star:#ff4fa3"><img src="parker-3.jpg" alt="Parker cheering in his baseball uniform"><span class="cap">Go Parker!</span></button>
   <h1 id="title" aria-label="Parker's Happy Birthday Page!"></h1>
   <p class="sub">Tap a video to sing along!</p>
 </header>
@@ -222,6 +239,14 @@ const VIDEOS = [
   { id: "aPaMvsvfUB8", name: "Cameron Birthday 2" }
 ];
 
+/* Parker's photos, sprinkled between the video cards */
+const PHOTOS = [
+  { src: "parker-1.jpg", cap: "Birthday boy!", alt: "Parker with his birthday cake" },
+  { src: "parker-2.jpg", cap: "Batter up!", alt: "Parker running at baseball with his coach" },
+  { src: "parker-3.jpg", cap: "Go Parker!", alt: "Parker cheering in his baseball uniform" },
+  { src: "parker-4.jpg", cap: "Number 21!", alt: "Parker holding his bat and cheering" }
+];
+
 const KEY = "bday-videos-v1";
 const COLORS = ["#ff4fa3","#ffd23f","#3ddc84","#5fd3ff","#ff8a3d","#b98cff"];
 const $ = s => document.querySelector(s);
@@ -264,7 +289,13 @@ function render(){
   wall.innerHTML = videos.map((v, i) => {
     const r = rand(v.id + i);
     const rot = (r() * 16 - 8).toFixed(1), dx = (r() * 24 - 12).toFixed(0), dy = (r() * 30 - 10).toFixed(0);
-    return `<button class="card" data-i="${i}" style="--rot:${rot}deg;--dx:${dx}px;--dy:${dy}px;--tape:${COLORS[i % 6]}">
+    let photo = "";
+    if (i % 3 === 1) {
+      const k = Math.floor(i / 3) % PHOTOS.length, p = PHOTOS[k];
+      photo = `<button class="photo" data-p="${k}" style="--rot:${(i % 2 ? 7 : -7) + (r() * 4 - 2)}deg;--dx:${(r() * 20 - 10).toFixed(0)}px;--dy:${(r() * 20).toFixed(0)}px;--star:${COLORS[(i + 3) % 6]}">
+        <img src="${p.src}" alt="${esc(p.alt)}" loading="lazy"><span class="cap">${esc(p.cap)}</span></button>`;
+    }
+    return photo + `<button class="card" data-i="${i}" style="--rot:${rot}deg;--dx:${dx}px;--dy:${dy}px;--tape:${COLORS[i % 6]}">
       <div class="thumb"><img src="${thumb(esc(v.id))}" alt="" loading="lazy"><span class="play"></span></div>
       <div class="label">${esc(v.name || "Happy Birthday!")}</div>
     </button>`;
@@ -346,6 +377,13 @@ $("#wall").addEventListener("click", e => {
   const r = c.getBoundingClientRect();
   c.classList.add("tapped"); confetti(r.left + r.width / 2, r.top + r.height / 2, 24); tone([523, 659, 784]);
   setTimeout(() => { c.classList.remove("tapped"); play(+c.dataset.i); }, 380);
+});
+/* tapping a photo: wiggle, confetti and a happy chime */
+document.addEventListener("click", e => {
+  const p = e.target.closest(".photo"); if (!p) return;
+  const r = p.getBoundingClientRect();
+  p.classList.add("tapped"); confetti(r.left + r.width / 2, r.top + r.height / 3, 30); tone([784, 988, 1175, 1568], .09);
+  setTimeout(() => p.classList.remove("tapped"), 450);
 });
 $("#back").onclick = closePlayer;
 $("#again").onclick = () => { $("#controls").classList.remove("ended"); try { yt.seekTo(0); yt.playVideo(); } catch(e){ play(current); } };
