@@ -247,7 +247,9 @@ const PHOTOS = [
   { src: "parker-4.jpg", cap: "Number 21!", alt: "Parker holding his bat and cheering" }
 ];
 
-const KEY = "bday-videos-v1";
+/* The saved list is tied to this exact built-in list: whenever VIDEOS changes in the file,
+   every device drops its old saved copy and shows the new list. */
+const KEY = "bday-videos-" + VIDEOS.map(v => v.id + v.name).join("|").split("").reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 7);
 const COLORS = ["#ff4fa3","#ffd23f","#3ddc84","#5fd3ff","#ff8a3d","#b98cff"];
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
